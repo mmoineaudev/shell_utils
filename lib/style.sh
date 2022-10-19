@@ -28,7 +28,7 @@ print() {
     echo -e "${PROMPT_STYLE} $1 ${RAZ_STYLE}"
 }
 # pour normaliser l'affichage menu, prends deux paramètres, le numéro de l'item, et le label
-prompt_menu_item() {
+print_menu_item() {
     if [[ $2 ]]; then 
         echo -e "${ORANGE_STYLE} $1 \t ${BLUE_STYLE} -->  $2 ${RAZ_STYLE}"
     else 

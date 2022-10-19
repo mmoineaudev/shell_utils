@@ -12,12 +12,15 @@
 # Imports
 ######################################
 BASEDIR=$(dirname "$0")
+ls ./lib | grep ".sh"
 # Déclaration des noms de fichiers dans le répertoire des dépendances 
-IMPORTS=(
-    style.sh
-    lib1.sh
-) # l'ordre d'import n'importe pas, une fois les fichiers sourcés chacunes des fonctions appelées depuis $0 peut utiliser chacune des dépendances, 
+IMPORTS=( ) # l'ordre d'import n'importe pas, une fois les fichiers sourcés chacunes des fonctions appelées depuis $0 peut utiliser chacune des dépendances, 
 # attention à la surcharge de noms de variables !
+echo -n "Saisissez la liste des dépendances que vous souhaitez utiliser
+format attendu : style.sh lib1 lib2
+>"
+read -r IMPORTS
+echo -e "\e[91m ${IMPORTS[@]} \e[0m"
 
 # Import des fonctions et variables de ces fichiers avec arrêt du script en cas d'erreur
 for dependancy in ${IMPORTS[@]}; do

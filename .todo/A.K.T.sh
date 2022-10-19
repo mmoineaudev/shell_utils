@@ -113,14 +113,14 @@ display_warning_if_root() {
 
 # ah, j'avais oublié de l'ajouter celle là... Un peu tard
 # Mais ça laisse l'opportunité de faire de la qualimétrie plus tard
-prompt() {
+print() {
     echo -e "${PROMPT_STYLE} $1 ${RAZ_STYLE}"
 }
-prompt_no_newline() {
+print_no_newline() {
     echo -ne "${PROMPT_STYLE} $1 ${RAZ_STYLE}"
 }
 # pour normaliser l'affichage menu, prends deux paramètres, le numéro de l'item, et le label
-prompt_menu_item() {
+print_menu_item() {
     if [[ $2 ]]; then 
         echo -e "${ORANGE_STYLE} $1 \t ${BLUE_STYLE} -->  $2 ${RAZ_STYLE}"
     else 
@@ -134,9 +134,9 @@ exit_ok() {
     exit 0
 }
 
-prompt_again() {
+print_again() {
     doc "pour réafficher le menu"
-    prompt "Appuyez sur entrée "
+    print "Appuyez sur entrée "
     PROMPT_AGAIN=
     read PROMPT_AGAIN
     if [[ $PROMPT_AGAIN ]]; then
@@ -166,7 +166,7 @@ htop_but_custom_and_usable_in_ssh() {
 multi_folder_display_weight_and_sort_by_update_date() {
     doc "Affiche le poids et date de modification des fichiers"
     echo "Vous pouvez lister autant d'arborescences que vous souhaitez séparées par un espace"
-    prompt "Arborescence(s)/fichier(s) :"
+    print "Arborescence(s)/fichier(s) :"
     read TO_BE_SEARCHED
     ls -lath ${TO_BE_SEARCHED}
 }
@@ -199,11 +199,11 @@ look_for_lost_dumps_and_temp_files() {
     nommages_recherches="(dump|save|temp|old|wip)"
     print_title "Recherche des fichiers dont le nom contient ${nommages_recherches}"
 
-    prompt_menu_item " Arborescence /hawai/ : "
+    print_menu_item " Arborescence /hawai/ : "
     private_method_find_biggest_files_under_path "/hawai/" 1000 | egrep -i ${nommages_recherches}
-    prompt_menu_item " Arborescence /home/ : "
+    print_menu_item " Arborescence /home/ : "
     private_method_find_biggest_files_under_path "/home/" 1000 | egrep -i ${nommages_recherches}
-    prompt_menu_item " Arborescence /tmp/ : "
+    print_menu_item " Arborescence /tmp/ : "
     private_method_find_biggest_files_under_path "/tmp/" 1000 | egrep -i ${nommages_recherches}
 
 }
@@ -271,51 +271,51 @@ coffee() {
 # un genre de tutoriel interactif
 how_to_import_hawai_dump() {
     doc "ce tutoriel sera peut être scripté un jour, mais n'étant pas à l'aise avec les suppressions de bases automatiques, ça ne sera pas fait par moi"
-    prompt "Ce script est un tutoriel interactif : il ne fait AUCUNE action sur les machines, il donne juste les étapes à suivre et écrit la structure de votre commentaire redmine, dans lequel vous devrez ajouter vos logs d'exécution."
-    prompt "Appuyez sur entrée à chaque fin d'étape pour afficher la suivante."
-    prompt "Saisissez le hostname du serveur moniteur de la plateforme (sans le .giin.recouv) :"
+    print "Ce script est un tutoriel interactif : il ne fait AUCUNE action sur les machines, il donne juste les étapes à suivre et écrit la structure de votre commentaire redmine, dans lequel vous devrez ajouter vos logs d'exécution."
+    print "Appuyez sur entrée à chaque fin d'étape pour afficher la suivante."
+    print "Saisissez le hostname du serveur moniteur de la plateforme (sans le .giin.recouv) :"
     MONITEUR=
     read -p "Moniteur : " MONITEUR
-    prompt "Saisissez le nom de l'application, qui est normalement aussi le nom de la base (exemple licorn, syncnav ...) :"
+    print "Saisissez le nom de l'application, qui est normalement aussi le nom de la base (exemple licorn, syncnav ...) :"
     APPLI=
     read -p "Application : " APPLI
-    prompt "Saisissez le nom du fichier dump :"
+    print "Saisissez le nom du fichier dump :"
     DUMPFILE=
     read -p "Fichier dump : " DUMPFILE
     print_separator
-    prompt "h1.  Processus de restoration de dumps en hawai v6"
+    print "h1.  Processus de restoration de dumps en hawai v6"
     echo # sinon ça affiche pas le titre dans redmine
     doc "Dans la pratique le moyen le plus rapide de faire l'action suivante est dans ce script..."
-    prompt "h2.  Dans http://${MONITEUR}.giin.recouv:1000/hwi-services/ : stopper les Apache et Tomcat"
+    print "h2.  Dans http://${MONITEUR}.giin.recouv:1000/hwi-services/ : stopper les Apache et Tomcat"
     wait_for_user_confirmation
-    prompt "h2.  Dans http://${MONITEUR}.giin.recouv:1000/hwi-sgbd/ : onglet \"Gestion cluster\", désengager les serveurs esclaves"
+    print "h2.  Dans http://${MONITEUR}.giin.recouv:1000/hwi-sgbd/ : onglet \"Gestion cluster\", désengager les serveurs esclaves"
     wait_for_user_confirmation
-    prompt "h2.  exécuter la target hawai de suppression de la base : hawai ${APPLI}_empty_base , 'entrée' puis 'n'"
+    print "h2.  exécuter la target hawai de suppression de la base : hawai ${APPLI}_empty_base , 'entrée' puis 'n'"
     wait_for_user_confirmation
-    prompt "h2. exécutez les commande suivantes l'une après l'autre : "
+    print "h2. exécutez les commande suivantes l'une après l'autre : "
 
     echo -e "${RED_STYLE} /!\\ CES COMMANDES N'AFFICHENT RIEN ET NE FINISSENT JAMAIS SI ON UTILISE UN CHEMIN ABSOLU DANS LE NOM DE DUMP...${RAZ_STYLE}"
 
-    prompt "<pre>"
+    print "<pre>"
     echo -e "${BLUE_STYLE} cd [path] ${RAZ_STYLE}"
     echo -e "${BLUE_STYLE} sudo su ${RAZ_STYLE}"
-    prompt "# Si le dump est de taille modérée :"
+    print "# Si le dump est de taille modérée :"
     echo -e "${BLUE_STYLE} pg_restore -U postgres -Fc -v -d ${APPLI} ${DUMPFILE} ${RAZ_STYLE}"
-    prompt "# Si le dump est très gros :"
+    print "# Si le dump est très gros :"
     echo -e "${BLUE_STYLE} nohup pg_restore -U postgres -Fc -v -d ${APPLI} ${DUMPFILE} & ${RAZ_STYLE}"
-    prompt "# Si le dump est sous la forme d'un dossier contenant plusieurs fichiers :"
+    print "# Si le dump est sous la forme d'un dossier contenant plusieurs fichiers :"
     echo -e "${BLUE_STYLE} pg_restore -U postgres -v -d ${APPLI} -Fd [dossier] ${RAZ_STYLE}"
 
-    prompt "# Contrôle du code retour"
+    print "# Contrôle du code retour"
     echo -e "${BLUE_STYLE} echo \"CR=[\$?]\" ${RAZ_STYLE}"
-    prompt "</pre>"
+    print "</pre>"
 
-    prompt "Assurez vous de voir apparaître dans la log des tables, séquences, index et contraintes : "
+    print "Assurez vous de voir apparaître dans la log des tables, séquences, index et contraintes : "
     echo -e "${RED_STYLE} si une erreur de type 'pg_restore: [custom archiver] could not read from input file: end of file' apparaît, le dump est corrompu et vous devez vous en procurer un autre. ${RAZ_STYLE}"
     wait_for_user_confirmation
-    prompt "h2. Au terme de la manipulation, relancez les serveurs Apache et Tomcat, réengagez les serveurs esclaves"
+    print "h2. Au terme de la manipulation, relancez les serveurs Apache et Tomcat, réengagez les serveurs esclaves"
     print_separator
-    prompt "Fin de la procédure"
+    print "Fin de la procédure"
 }
 
 display_cron_tasks() {
@@ -332,12 +332,12 @@ display_cron_tasks() {
 list_and_cat_app_properties() {
     doc "Permet de lister puis d'affichier un fichier.properties de son choix"
     ls -lathR ${APPLICATION_PROPERTIES}*/*.properties
-    prompt "Choississez un fichier pour l'ouvrir, laisser vide sinon : "
+    print "Choississez un fichier pour l'ouvrir, laisser vide sinon : "
     read -p " --> " ARBORESCENCE_VERS_UN_PROPERTIES
     echo "[cat ${ARBORESCENCE_VERS_UN_PROPERTIES}] :"
     cat ${ARBORESCENCE_VERS_UN_PROPERTIES}
     print_separator
-    prompt "L'URL http://cnp69ginintegv2dev.cer69.recouv/cch/properties_summary/properties_summary.htm permet de consulter les fichiers properties de plusieurs couloirs en même temps"
+    print "L'URL http://cnp69ginintegv2dev.cer69.recouv/cch/properties_summary/properties_summary.htm permet de consulter les fichiers properties de plusieurs couloirs en même temps"
     # on reset la variable
     NOM_TOKEN=
     # echo -ne "${PROMPT_STYLE}[j'ai jamais réussi à faire marcher ça mais à priori la commande est bonne] Si vous souhaitez savoir quelles target réinstaller en cas de modification d'un token, renseignez ici la clé du token, laisser vide sinon : ${NOM_TOKEN}${RAZ_STYLE}"
@@ -369,11 +369,11 @@ list_all_agents_s_logs() {
 
     count_error_debug_warn_fatal_in_agents_logs
     
-    prompt "Selectionnez un fichier log pour analyse, vide sinon: "
+    print "Selectionnez un fichier log pour analyse, vide sinon: "
     selected_log=
     read selected_log
     if [[ $selected_log ]]; then
-        prompt "Entrez un pattern (un|deux|trois) pour rechercher une occurence de mot dans ce log logs, vide sinon: "
+        print "Entrez un pattern (un|deux|trois) pour rechercher une occurence de mot dans ce log logs, vide sinon: "
         DO_SEARCH=
         read DO_SEARCH
         if [[ $DO_SEARCH ]]; then
@@ -382,7 +382,7 @@ list_all_agents_s_logs() {
         fi
     fi
 
-    prompt "Entrez 'y' pour lister tous les fichiers sous ${HAWAI_LOGS_AGENTS}, vide sinon: "
+    print "Entrez 'y' pour lister tous les fichiers sous ${HAWAI_LOGS_AGENTS}, vide sinon: "
     # on remet a vide au cas ou
     DO_LIST=
     read DO_LIST
@@ -390,7 +390,7 @@ list_all_agents_s_logs() {
         find ${HAWAI_LOGS_AGENTS} -type f | xargs -r ls -lath
         
     fi
-    prompt " Entrez un chemin pour consulter un fichier ou laissez vide : "
+    print " Entrez un chemin pour consulter un fichier ou laissez vide : "
     # on remet a vide au cas ou
     LOG_PATH_TO_BE_TAILED=
     read LOG_PATH_TO_BE_TAILED
@@ -398,7 +398,7 @@ list_all_agents_s_logs() {
         ls -lath ${LOG_PATH_TO_BE_TAILED}
         # on remet a vide au cas ou
         HOW_MANY_LINES=
-        prompt " combien de lignes voulez-vous consulter (tail) : "
+        print " combien de lignes voulez-vous consulter (tail) : "
         read HOW_MANY_LINES
         tail -n ${HOW_MANY_LINES} ${LOG_PATH_TO_BE_TAILED}
         print_separator
@@ -411,19 +411,19 @@ create_dump_and_place_it_whereever_you_want() {
     global_disk_use
     print_separator
     psql -U postgres -c \\l 
-    prompt " Renseignez le nom de BASE (exemple licorn): "
+    print " Renseignez le nom de BASE (exemple licorn): "
     read BASE_NAME
-    prompt " Renseignez un suffixe (numéro de ticket, libelé quelconque, sans espace ni caractères spéciaux), ou laissez vide: "
+    print " Renseignez un suffixe (numéro de ticket, libelé quelconque, sans espace ni caractères spéciaux), ou laissez vide: "
     read SUFFIXE_DUMP
     echo "Choisissez l'emplacement de création du dump : "
     echo "Chemins féquemment utilisés : /hawai/data/ /hawai/sauvegarde/bases/"
-    prompt " Dossier cible ( /!\\ doit terminer par / ): "
+    print " Dossier cible ( /!\\ doit terminer par / ): "
     read TARGET_FOLDER
     print_title "Création d'un dump de la base $BASE_NAME sous $TARGET_FOLDER"
     # le -v est censé être facultatif, on peut l'enlever pour raccourcir le log, mais c'est la seule manière de
     # voir l'avancement et de s'assurer que tout a été traité
     YN=
-    prompt "Lancer la commande [ [...]pg_dump -U postgres ${BASE_NAME} -Fc -v -f ${TARGET_FOLDER}backup_${BASE_NAME}_$(date +"%Y_%m_%d")${SUFFIXE_DUMP}.dump] ? (y/n)"
+    print "Lancer la commande [ [...]pg_dump -U postgres ${BASE_NAME} -Fc -v -f ${TARGET_FOLDER}backup_${BASE_NAME}_$(date +"%Y_%m_%d")${SUFFIXE_DUMP}.dump] ? (y/n)"
     read YN
     if [[ $YN == 'y' ]]; then
         print_separator
@@ -467,10 +467,10 @@ create_sgbd_hawai_sauvegarde_base_mounting_point() {
     CHEMIN_ABSOLU_MONTAGE_FINAL=/hawai/sauvegarde/bases
     RACINE_DES_BACKUPS=/data/intnat/sauvegardes/sauvegardes_dumps
 
-    prompt "liste des serveurs \"Cible\" connus du script : "
+    print "liste des serveurs \"Cible\" connus du script : "
     echo -e "${BLUE_STYLE} cnp31ginbalance.cer31.recouv ${RAZ_STYLE}"
     echo -e "${BLUE_STYLE} cnp69balance.cer69.recouv ${RAZ_STYLE}"
-    prompt "Renseignez le nom du serveur \"cible\" du point de montage : "
+    print "Renseignez le nom du serveur \"cible\" du point de montage : "
     read NOM_SERVEUR_DISTANT
     if [[ $NOM_SERVEUR_DISTANT == "cnp31ginbalance.cer31.recouv" ]]; then
         ADDR_SERVEUR_DISTANT=10.206.57.39
@@ -478,14 +478,14 @@ create_sgbd_hawai_sauvegarde_base_mounting_point() {
         ADDR_SERVEUR_DISTANT=10.203.48.133
     fi
     echo -e "${BLUE_STYLE} L'adresse du serveur distant est ${ADDR_SERVEUR_DISTANT} ${RAZ_STYLE}"
-    prompt "Renseignez le couloir de la plateforme : "
+    print "Renseignez le couloir de la plateforme : "
     echo -ne "${BLUE_STYLE} Valeur dans la liste : C01 C02 C03 C04 C05 C06 C07 C08 : ${RAZ_STYLE}"
     read COULOIR
-    prompt "Nom de la plateforme (comme dans superPutty C0? - [ ${RED_STYLE} PLATEFORME ${RAZ_STYLE}${PROMPT_STYLE} ]) "
+    print "Nom de la plateforme (comme dans superPutty C0? - [ ${RED_STYLE} PLATEFORME ${RAZ_STYLE}${PROMPT_STYLE} ]) "
     read PLATEFORME
     doc "Mini astuce ici, on a besoin du numéro de serveur sgbd, c'est le dernier char du hostname"
     NUM_BDD="bd${var: -1}"
-    prompt "Renseignez le nom de l'application : "
+    print "Renseignez le nom de l'application : "
     # En minucule, sans espace en fin, utilisée pour crée la commande `hawai [APPLICATION]_backup_base`
     read APPLICATION
     doc "On remet ce qui doit être en maj en maj et en min en min"
@@ -495,10 +495,10 @@ create_sgbd_hawai_sauvegarde_base_mounting_point() {
     NUM_BDD=${NUM_BDD,,}
     APPLICATION=${APPLICATION,,}
     print_title "Relecture des paramètres"
-    prompt_menu_item " COULOIR : ${COULOIR}"
-    prompt_menu_item " PLATEFORME : ${PLATEFORME}"
-    prompt_menu_item " NUM_BDD : ${NUM_BDD}"
-    prompt_menu_item " APPLICATION : ${APPLICATION}"
+    print_menu_item " COULOIR : ${COULOIR}"
+    print_menu_item " PLATEFORME : ${PLATEFORME}"
+    print_menu_item " NUM_BDD : ${NUM_BDD}"
+    print_menu_item " APPLICATION : ${APPLICATION}"
     # Prérequis
     print_separator
     echo -e "${RED_STYLE} On vérifie que le dossier contenant les dumps générés par la base est vide avant de procéder au montage ${RAZ_STYLE}"
@@ -515,7 +515,7 @@ create_sgbd_hawai_sauvegarde_base_mounting_point() {
     mkdir -p ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}
     ls ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}
     echo -e "${BLUE_STYLE} Création d'un point de montage vers le serveur distant ${NOM_SERVEUR_DISTANT} : ${RAZ_STYLE}"
-    prompt "Appuyez sur entrée pour exécuter 'mount ${NOM_SERVEUR_DISTANT}:/ ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}' "
+    print "Appuyez sur entrée pour exécuter 'mount ${NOM_SERVEUR_DISTANT}:/ ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}' "
     #On remet a 0 au cas ou
     OK=
     read OK
@@ -523,7 +523,7 @@ create_sgbd_hawai_sauvegarde_base_mounting_point() {
     echo -ne "${BLUE_STYLE} Norme d'arborescence attendue [COULOIR]/[PLATEFORME]/[bdx] : ${RAZ_STYLE}"
     ARBORESCENCE=${RACINE_DES_BACKUPS}/${COULOIR}/${PLATEFORME}/${NUM_BDD}
     echo -e "${ARBORESCENCE}"
-    prompt "Appuyez sur entrée pour exécuter 'mkdir -p ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}/${ARBORESCENCE}' "
+    print "Appuyez sur entrée pour exécuter 'mkdir -p ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}/${ARBORESCENCE}' "
     #On remet à 0 au cas ou
     OK=
     read OK
@@ -532,23 +532,23 @@ create_sgbd_hawai_sauvegarde_base_mounting_point() {
     # le fstab est appelé systématiquement au démarage du serveur, et lors de la commande mount -a : on décrit le point de montage dans ce fichier pour le rendre persistant dans le temps
     print_title "Ajout d\'une ligne au /etc/fstab pour permettre le montage automatique "
     echo -e "${B_and_N_STYLE} ${NOM_SERVEUR_DISTANT}:${ARBORESCENCE} ${CHEMIN_ABSOLU_MONTAGE_FINAL} nfs rw,intr,addr=${ADDR_SERVEUR_DISTANT} 0 0 ${RAZ_STYLE}"
-    prompt "Appuyez sur entrée pour ajouter cette ligne au /etc/fstab "
+    print "Appuyez sur entrée pour ajouter cette ligne au /etc/fstab "
     #On remet à 0 au cas ou
     OK=
     read OK
     echo "${NOM_SERVEUR_DISTANT}:${ARBORESCENCE} ${CHEMIN_ABSOLU_MONTAGE_FINAL} nfs rw,intr,addr=${ADDR_SERVEUR_DISTANT}" 0 0 >>/etc/fstab
-    prompt "Vérifiez le fstab"
+    print "Vérifiez le fstab"
     cat /etc/fstab
     print_separator
-    prompt "Appuyez sur entrée pour procéder au montage du ${CHEMIN_ABSOLU_MONTAGE_FINAL} sur ${ARBORESCENCE} "
+    print "Appuyez sur entrée pour procéder au montage du ${CHEMIN_ABSOLU_MONTAGE_FINAL} sur ${ARBORESCENCE} "
     echo "mount -a :"
     mount -a
-    prompt "Code retour du montage : $? "
+    print "Code retour du montage : $? "
     doc "On supprime le montage temporaire"
     umount ${NOM_SERVEUR_DISTANT}:/ ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}
     rmdir ${CHEMIN_ABSOLU_MONTAGE_TEMPORAIRE}
 
-    prompt "L'opération est terminée, vous pouvez relancer la rotation des dumps via la commande (non géré par ce script) :"
+    print "L'opération est terminée, vous pouvez relancer la rotation des dumps via la commande (non géré par ce script) :"
     echo -e "${B_and_N_STYLE} hawai ${APPLICATION}_backup_base ${RAZ_STYLE}"
 }
 
@@ -588,7 +588,7 @@ check_partitions_and_fstab_and_create_sgbd_save_mountpoint_and_mount_all() {
             create_sgbd_hawai_sauvegarde_base_mounting_point
         fi
     else 
-        prompt "Cool, tout va bien alors."
+        print "Cool, tout va bien alors."
     fi
 
 }
@@ -715,8 +715,8 @@ start_tomcat() {
 }
 frequent_sql_request(){
     doc "A alimenter avec des requetes sql fréquentes"
-    #prompt_menu_item "Label fonctionnel" "requête;"
-    #prompt_menu_item "Monitoring de session" "SELECT * || ' sessions ouvertes ' as nb_sessions_ouvertes FROM pg_stat_activity;"
+    #print_menu_item "Label fonctionnel" "requête;"
+    #print_menu_item "Monitoring de session" "SELECT * || ' sessions ouvertes ' as nb_sessions_ouvertes FROM pg_stat_activity;"
 }
 
 connect_psql() {
@@ -724,7 +724,7 @@ connect_psql() {
     doc "on vérifie quand même que on est sur un serveur bdd"
     psql -U postgres -c "SELECT count(*) || ' sessions ouvertes ' as nb_sessions_ouvertes FROM pg_stat_activity;"  
     psql -V
-    prompt "Saisissez un nom d'utilisateur (postgres, ou user applicatif) : "
+    print "Saisissez un nom d'utilisateur (postgres, ou user applicatif) : "
     read user_name
     echo -ne "${BLUE_STYLE}"
     print_separator
@@ -732,21 +732,21 @@ connect_psql() {
     psql -U ${user_name} -c '\l'
     print_separator
     echo -ne "${RAZ_STYLE}"
-    prompt "Saisissez un nom de base, ou laissez vide : "
+    print "Saisissez un nom de base, ou laissez vide : "
     read bdd_name
     SUFFIXE=
     if [[ $bdd_name ]]; then
         SUFFIXE="-d ${bdd_name}"
     fi
-    prompt "Rappel des commandes postgres : "
-    prompt_menu_item 'Connexion à une bdd              :' '\\c dbname [username]'
-    prompt_menu_item 'Lister les bdd                   :' '\l  '
-    prompt_menu_item 'Lister les schémas               :' '\dn  '
-    prompt_menu_item 'Lister les tables                :' '\dt ou "SELECT table_name FROM information_schema;"'
-    prompt_menu_item 'Décrire la structure d une table :' '\d table '
-    prompt_menu_item 'historique des commandes         :' '\s  '
-    prompt_menu_item 'formatage (just do it plz)       :' '\x (...sinon les résultats de requêtes sont ILLISIBLES)'
-    prompt "Appuyez sur entrée pour vous connecter en BDD"
+    print "Rappel des commandes postgres : "
+    print_menu_item 'Connexion à une bdd              :' '\\c dbname [username]'
+    print_menu_item 'Lister les bdd                   :' '\l  '
+    print_menu_item 'Lister les schémas               :' '\dn  '
+    print_menu_item 'Lister les tables                :' '\dt ou "SELECT table_name FROM information_schema;"'
+    print_menu_item 'Décrire la structure d une table :' '\d table '
+    print_menu_item 'historique des commandes         :' '\s  '
+    print_menu_item 'formatage (just do it plz)       :' '\x (...sinon les résultats de requêtes sont ILLISIBLES)'
+    print "Appuyez sur entrée pour vous connecter en BDD"
     frequent_sql_request
     psql -U ${user_name} ${SUFFIXE}
     echo -e "${RAZ_STYLE}"
@@ -799,12 +799,12 @@ find_word_in_files() {
     PWD_COPY="$PWD" # c'est bizarre mais ça marche
     PATTERN_TO_SEARCH=
     PATH_TO_GO=
-    prompt "Souhaitez vous chercher dans une arborescence en particulier ? 
+    print "Souhaitez vous chercher dans une arborescence en particulier ? 
     Si non la recherche se fera dans ${PWD}
     Si oui saisissez l'arborescence : ${RAZ_STYLE}"
     read PATH_TO_GO
 
-    prompt "Saisissez un mot, ou une liste de mot au format : mot1|mot2|mot3 
+    print "Saisissez un mot, ou une liste de mot au format : mot1|mot2|mot3 
     Que cherchez vous ? ${RAZ_STYLE}"
     read PATTERN_TO_SEARCH
 
@@ -820,7 +820,7 @@ find_word_in_files() {
 verify_line_termination_and_formats() {
     # Christophe was here
     FILES_EXTENSIONS_TO_BE_CHECKED='.sh|.sql'
-    prompt "Saisissez une arborescence dans laquelle vérifier les encodings des ${FILES_EXTENSIONS_TO_BE_CHECKED}"
+    print "Saisissez une arborescence dans laquelle vérifier les encodings des ${FILES_EXTENSIONS_TO_BE_CHECKED}"
     read ARBORESCENCE_SOUHAITEE
     doc "on met tout en sudo car on veut tout voir"
     sudo find ${ARBORESCENCE_SOUHAITEE} -exec file {} \; | sudo grep "CRLF" | sudo egrep ${FILES_EXTENSIONS_TO_BE_CHECKED}
@@ -845,8 +845,8 @@ $(typeset -f print_title)
 $(typeset -f ready_steady_go)
 $(typeset -f display_warning_if_root)
 $(typeset -f exit_ok)
-$(typeset -f prompt_again)
-$(typeset -f prompt)
+$(typeset -f print_again)
+$(typeset -f print)
 $(typeset -f htop_but_custom_and_usable_in_ssh)
 $(typeset -f multi_folder_display_weight_and_sort_by_update_date)
 $(typeset -f global_disk_use)
@@ -863,7 +863,7 @@ $(typeset -f list_and_cat_app_properties)
 $(typeset -f list_all_agents_s_logs)
 $(typeset -f create_dump_and_place_it_whereever_you_want)
 $(typeset -f stop_apache)
-$(typeset -f prompt_menu_item)
+$(typeset -f print_menu_item)
 $(typeset -f connect_psql)
 $(typeset -f stop_tomcat)
 $(typeset -f stop_and_clean_tomcat)
@@ -883,7 +883,7 @@ ssh_menu_display() ( # c'est pour la nested function qu'on mets des () ( code ),
     doc "Affiche les commandes qu'on veut explicitement mettre à disposition en ssh"
     VERBOSE_OFF=$1
     # nested function en shell 
-    inner_prompt_menu_item() {
+    inner_print_menu_item() {
         # si c'est vide, on affiche les descriptions
         if [[ -z $VERBOSE_OFF ]]; then # si la verbose n'est pas off
             echo -e "${BLUE_STYLE} [ # ${ORANGE_STYLE} $1 \n\t${BLUE_STYLE} $2 ] ${RAZ_STYLE}"
@@ -894,33 +894,33 @@ ssh_menu_display() ( # c'est pour la nested function qu'on mets des () ( code ),
     doc "Options de noms de fonctions, on les récupère dynamiquement dans le script pour les pousser dans le bash récepteur de la commande ssh
         On peut utiliser même celles qui ne sont pas dans cette liste, cf export_all_funtions_ssh"
     print_title "Fonctions disponibles en ssh :"
-    inner_prompt_menu_item "check_partitions_and_fstab_and_create_sgbd_save_mountpoint_and_mount_all " " Vérifie que les points de montage sont positionnés et montés, permet de les relancer si besoin, spoiler si vous essayez en shh de créer un point de montage ça marchera pas, pour raison de sécurité"
-    inner_prompt_menu_item "connect_psql ${RAZ_STYLE} $RED_STYLE Se connecter en base, un peu overkill en ssh"
-    inner_prompt_menu_item "count_error_debug_warn_fatal_in_agents_logs " " Affiche les logs, compte les occurence des niveaux de log sur le fichier de votre choix"
-    inner_prompt_menu_item "count_log_occurences_by_log_level " " Prends en paramètre un log, compte les occurences par niveau de log"
-    inner_prompt_menu_item "create_dump_and_place_it_whereever_you_want " " Créée un dump, le place où vous voulez"
-    inner_prompt_menu_item "display_cron_tasks " " Consulter les crontask"
-    inner_prompt_menu_item "display_yum_cache " " Vérifier le cache yum"
-    inner_prompt_menu_item "find_word_in_files " " Cherche un mot dans une arborescence de fichier"
-    inner_prompt_menu_item "get_file_via_scp " " Recevoir un fichier/dossier via SCP"
-    inner_prompt_menu_item "get_installed_apps " " Permet d'avoir des informations sur les rpm livrés installés"
-    inner_prompt_menu_item "global_disk_use " " Afficher l'usage du disque et les partitions"
-    inner_prompt_menu_item "htop_but_custom_and_usable_in_ssh  " " Visualiser les processus"
-    inner_prompt_menu_item "list_all_agents_s_logs " " Liste les logs des agents"
-    inner_prompt_menu_item "list_and_cat_app_properties " " Liste les [appli].properties et permet de cat celui qu'on veut"
-    inner_prompt_menu_item "look_for_lost_dumps_and_temp_files " " Retrouve les fichiers temporaires & dumps sous /hawai"
-    inner_prompt_menu_item "multi_folder_display_weight_and_sort_by_update_date " " Consulter la date de modification d'un ou plusieurs fichiers"
-    inner_prompt_menu_item "public_method_display_biggest_files_under_path " " Afficher les N plus gros fichiers sous l'arborescence souhaitée"
-    inner_prompt_menu_item "send_file_via_scp " " Envoyer un fichier/dossier via SCP"
-    inner_prompt_menu_item "start_apache [log] #pour afficher les logs " " Démarre un serveur apache s'il est présent sur la machine"
-    inner_prompt_menu_item "start_tomcat [log] #pour afficher les logs " " Démarre un serveur tomcat s'il est présent sur la machine"
-    inner_prompt_menu_item "stop_and_clean_tomcat " " Stop & clean un tomcat (et affiche les logs)"
-    inner_prompt_menu_item "stop_apache " " Stoppe un apache (et affiche les logs)"
-    inner_prompt_menu_item "stop_tomcat " " Stoppe un tomcat (et affiche les logs)"
-    inner_prompt_menu_item "tail_apache_and_tomcat_logs " " Permet d'accéder à la fois aux logs tomcat et apache s'ils existent"
-    inner_prompt_menu_item "verify_line_termination_and_formats " " Commande alm pour vérifier les encodings de n'importe quelle arborescence"
-    inner_prompt_menu_item "verify_line_termination_and_formats_alm " " Commande alm pour vérifier les encodings de ${HWI_INSTALL}"
-    inner_prompt_menu_item "yum clean all " " Pour hawai > 4 on peut yum clean all (cf #647845), sinon contournement : display_yum_cache ; select_and_delete"
+    inner_print_menu_item "check_partitions_and_fstab_and_create_sgbd_save_mountpoint_and_mount_all " " Vérifie que les points de montage sont positionnés et montés, permet de les relancer si besoin, spoiler si vous essayez en shh de créer un point de montage ça marchera pas, pour raison de sécurité"
+    inner_print_menu_item "connect_psql ${RAZ_STYLE} $RED_STYLE Se connecter en base, un peu overkill en ssh"
+    inner_print_menu_item "count_error_debug_warn_fatal_in_agents_logs " " Affiche les logs, compte les occurence des niveaux de log sur le fichier de votre choix"
+    inner_print_menu_item "count_log_occurences_by_log_level " " Prends en paramètre un log, compte les occurences par niveau de log"
+    inner_print_menu_item "create_dump_and_place_it_whereever_you_want " " Créée un dump, le place où vous voulez"
+    inner_print_menu_item "display_cron_tasks " " Consulter les crontask"
+    inner_print_menu_item "display_yum_cache " " Vérifier le cache yum"
+    inner_print_menu_item "find_word_in_files " " Cherche un mot dans une arborescence de fichier"
+    inner_print_menu_item "get_file_via_scp " " Recevoir un fichier/dossier via SCP"
+    inner_print_menu_item "get_installed_apps " " Permet d'avoir des informations sur les rpm livrés installés"
+    inner_print_menu_item "global_disk_use " " Afficher l'usage du disque et les partitions"
+    inner_print_menu_item "htop_but_custom_and_usable_in_ssh  " " Visualiser les processus"
+    inner_print_menu_item "list_all_agents_s_logs " " Liste les logs des agents"
+    inner_print_menu_item "list_and_cat_app_properties " " Liste les [appli].properties et permet de cat celui qu'on veut"
+    inner_print_menu_item "look_for_lost_dumps_and_temp_files " " Retrouve les fichiers temporaires & dumps sous /hawai"
+    inner_print_menu_item "multi_folder_display_weight_and_sort_by_update_date " " Consulter la date de modification d'un ou plusieurs fichiers"
+    inner_print_menu_item "public_method_display_biggest_files_under_path " " Afficher les N plus gros fichiers sous l'arborescence souhaitée"
+    inner_print_menu_item "send_file_via_scp " " Envoyer un fichier/dossier via SCP"
+    inner_print_menu_item "start_apache [log] #pour afficher les logs " " Démarre un serveur apache s'il est présent sur la machine"
+    inner_print_menu_item "start_tomcat [log] #pour afficher les logs " " Démarre un serveur tomcat s'il est présent sur la machine"
+    inner_print_menu_item "stop_and_clean_tomcat " " Stop & clean un tomcat (et affiche les logs)"
+    inner_print_menu_item "stop_apache " " Stoppe un apache (et affiche les logs)"
+    inner_print_menu_item "stop_tomcat " " Stoppe un tomcat (et affiche les logs)"
+    inner_print_menu_item "tail_apache_and_tomcat_logs " " Permet d'accéder à la fois aux logs tomcat et apache s'ils existent"
+    inner_print_menu_item "verify_line_termination_and_formats " " Commande alm pour vérifier les encodings de n'importe quelle arborescence"
+    inner_print_menu_item "verify_line_termination_and_formats_alm " " Commande alm pour vérifier les encodings de ${HWI_INSTALL}"
+    inner_print_menu_item "yum clean all " " Pour hawai > 4 on peut yum clean all (cf #647845), sinon contournement : display_yum_cache ; select_and_delete"
     print_separator
 )
 
@@ -1093,7 +1093,7 @@ while :; do
     exit) break ;;
     *) print_title "Merci de saisir une commande dans la plage des valeurs prévues" ;;
     esac
-    prompt_again
+    print_again
 done
 
 ######################################################################################

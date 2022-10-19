@@ -1,41 +1,6 @@
 #!/bin/bash
 
-count_log_occurences_by_log_level() {
-    
-    logfile=$1
-    NB_LINES=$(cat ${logfile} | wc -l)
-    NB_DEBUG=
-    NB_WARN=
-    NB_ERR=
-    NB_FATAL=
-    NB_GRAVE=
-    if [[ ${NB_LINES} -gt 0 ]]; then
-        echo -ne "${print_STYLE} Nombre de lignes : ${NB_LINES}"
-        NB_DEBUG=$(cat ${logfile} | grep -i "debug" | wc -l)
-        if [[ ${NB_DEBUG} -gt 0 ]]; then
-            echo -ne "${print_STYLE} debug : ${NB_DEBUG}"
-        fi
-        NB_WARN=$(cat ${logfile} | grep -i "warn" | wc -l)
-        if [[ ${NB_WARN} -gt 0 ]]; then
-            echo -ne "${PURPLE_STYLE} warn : ${NB_WARN}"
-        fi
-        NB_ERR=$(cat ${logfile} | egrep -i "(erreur|error)" | wc -l)
-        if [[ ${NB_ERR} -gt 0 ]]; then
-            echo -ne "${RED_STYLE} erreur/error : ${NB_ERR}"
-        fi
-        NB_FATAL=$(cat ${logfile} | grep -i "fatal" | wc -l)
-        if [[ ${NB_FATAL} -gt 0 ]]; then
-            echo -ne "${ORANGE_STYLE} fatal : ${NB_FATAL}"
-        fi
-        NB_GRAVE=$(cat ${logfile} | grep -i "grave" | wc -l)
-        if [[ ${NB_GRAVE} -gt 0 ]]; then
-            echo -ne "${RED_STYLE} grave : ${NB_GRAVE}"
-        fi
-    else  
-        echo -ne "vide"
-    fi  
-    echo -e ${RAZ_STYLE}
-}
+
 
 send_file_via_scp() {
     print_title "Envoyer un fichier depuis $(hostname) via SCP (ssh) vers un serveur distant"

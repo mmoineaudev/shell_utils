@@ -43,14 +43,14 @@ no_run() {
     echo -e ${RAZ_STYLE}
 }
 
-prompt() {
+print() {
     echo -e "${RED_STYLE} # ${PROMPT_STYLE} $1 ${RAZ_STYLE}"
 }
-prompt_ko() {
+print_ko() {
     echo -e "${ORANGE_STYLE} # ${RED_STYLE} $1 ${RAZ_STYLE}"
 }
 # pour normaliser l'affichage menu, prends deux paramètres, le numéro de l'item, et le label
-prompt_menu_item() {
+print_menu_item() {
     echo -e "${ORANGE_STYLE} $1 \t ${BLUE_STYLE} $2 ${RAZ_STYLE}"
 }
 
@@ -87,11 +87,11 @@ exemple() {
 
 }
 exit_ok() {
-    prompt "Bonne journée !"
+    print "Bonne journée !"
     exit 0
 }
 
-prompt_again() {
+print_again() {
     echo -ne "${PROMPT_STYLE} Appuyez sur entrée ${RAZ_STYLE}"
     read -p " " PROMPT_AGAIN
     if [[ $PROMPT_AGAIN ]]; then
@@ -168,99 +168,99 @@ coffee() {
 
 # Permet de se connecter en bdd sur un pod
 connect_psql() { 
-    prompt "CONNEXION A UNE BASE POSTGRES DANS UN POD PFS"
-    prompt "Entrez le nom du namespace :"
+    print "CONNEXION A UNE BASE POSTGRES DANS UN POD PFS"
+    print "Entrez le nom du namespace :"
     exemple
     NAMESPACE=
     read NAMESPACE
-    prompt "namepace : ${NAMESPACE}"
+    print "namepace : ${NAMESPACE}"
     kubectl config set-context --current --namespace=${NAMESPACE}
     kubectl get pods -n ${NAMESPACE} --no-headers | egrep -i "(database|bdd|postgres)" | egrep -i "(running)"
-    prompt "Entrez le nom du pod :"
+    print "Entrez le nom du pod :"
     read nom_pod
     
-    prompt "Liste des bases disponibles dans ${nom_pod}"
+    print "Liste des bases disponibles dans ${nom_pod}"
 
     kubectl exec -it ${nom_pod} -- psql -c \\l ;
     read -p "Renseignez la valeur DBNAME=" DBNAME
-    prompt "Rappel des commandes postgres : "
-    prompt_menu_item 'Connexion à une bdd              :' '\\c dbname [username]'
-    prompt_menu_item 'Lister les bdd                   :' '\l  '
-    prompt_menu_item 'Lister les schémas               :' '\dn  '
-    prompt_menu_item 'Lister les tables                :' '\dt ou "SELECT table_name FROM information_schema;"'
-    prompt_menu_item 'Décrire la structure d une table :' '\d table '
-    prompt_menu_item 'historique des commandes         :' '\s  '
-    prompt_menu_item 'formatage (just do it plz)       :' '\x (...sinon les résultats de requêtes sont ILLISIBLES)'
+    print "Rappel des commandes postgres : "
+    print_menu_item 'Connexion à une bdd              :' '\\c dbname [username]'
+    print_menu_item 'Lister les bdd                   :' '\l  '
+    print_menu_item 'Lister les schémas               :' '\dn  '
+    print_menu_item 'Lister les tables                :' '\dt ou "SELECT table_name FROM information_schema;"'
+    print_menu_item 'Décrire la structure d une table :' '\d table '
+    print_menu_item 'historique des commandes         :' '\s  '
+    print_menu_item 'formatage (just do it plz)       :' '\x (...sinon les résultats de requêtes sont ILLISIBLES)'
     kubectl exec -it ${nom_pod} -- psql -c "SELECT count(*) || ' sessions ouvertes ' as nb_sessions_ouvertes FROM pg_stat_activity;"
-    prompt "Appuyez sur entrée pour vous connecter en BDD"
+    print "Appuyez sur entrée pour vous connecter en BDD"
     kubectl exec -it ${nom_pod} -- psql ${DBNAME}
 }
 
 # Petit aide mémoire des commandes et des vérifs d'usage à faire en cas de nouvelle livraison pfs, 
 # a destination en priorité des nouveaux entrants
 autoconformite_livraison_pfs() {
-    prompt "Prérequis : le repo doit être déjà cloné sur votre environnement bastion"
-    prompt "Saisissez le couloir cible format C0X :" ; read COULOIR
+    print "Prérequis : le repo doit être déjà cloné sur votre environnement bastion"
+    print "Saisissez le couloir cible format C0X :" ; read COULOIR
     ARBORESCENCE_LOCALE=$(du -h | egrep "\.git$" | sed 's/\.git//g')
-    prompt "${ARBORESCENCE_LOCALE}"
-    prompt "Saisissez le chemin absolu vers votre repo local :" ; read PATH_TO_LOCAL
-    prompt "Recherche du ${PATH_TO_LOCAL}"
+    print "${ARBORESCENCE_LOCALE}"
+    print "Saisissez le chemin absolu vers votre repo local :" ; read PATH_TO_LOCAL
+    print "Recherche du ${PATH_TO_LOCAL}"
     cd ${PATH_TO_LOCAL} ; pwd
-    prompt "(la commande suivante ne marche que si on utilise git en http avec les ID dans la remote)"
+    print "(la commande suivante ne marche que si on utilise git en http avec les ID dans la remote)"
     REMOTE=$(git remote -v)
     echo $REMOTE | cut -d '@' -f 3 
     # Retrouver le tag
     git fetch --all --tags
-    prompt 'Le format attendu du tag est le suivant : AAMMPP_VV_II avec :'
-    prompt '    AAMM: N° du lot sous la forme Année Mois (exemple: 2203 pour Mars 2022)'
-    prompt '    PP: N° de l increment en production'
-    prompt '    VV: N° de l incrément en validation'
-    prompt '    II: N° de l incrément en intégration'
-    prompt "Tags disponibles sur le repo :"
+    print 'Le format attendu du tag est le suivant : AAMMPP_VV_II avec :'
+    print '    AAMM: N° du lot sous la forme Année Mois (exemple: 2203 pour Mars 2022)'
+    print '    PP: N° de l increment en production'
+    print '    VV: N° de l incrément en validation'
+    print '    II: N° de l incrément en intégration'
+    print "Tags disponibles sur le repo :"
     git tag
-    prompt "Saisissez le tag indiqué en DLOT, laissez vide si absent" ; read EXPECTED_TAG
+    print "Saisissez le tag indiqué en DLOT, laissez vide si absent" ; read EXPECTED_TAG
     if [[ ${EXPECTED_TAG} ]]; then 
         PRESENCE_DU_TAG=$(git tag | grep ${EXPECTED_TAG} | wc -l)
         if [[ ${PRESENCE_DU_TAG} -eq 1 ]]; then 
-            prompt "[OK] Le tag ${EXPECTED_TAG} existe."
+            print "[OK] Le tag ${EXPECTED_TAG} existe."
 
-            prompt "Si c'est la première livraison :"
-            prompt "      Pour créer la branche à partir du tag :"
+            print "Si c'est la première livraison :"
+            print "      Pour créer la branche à partir du tag :"
             echo "git checkout tags/${EXPECTED_TAG} # positionne le pointeur à l'emplacement du tag "
             echo
             echo "git checkout -b INT/${COULOIR} # crée la branche "
-            prompt "Si la branche existe déjà : "
+            print "Si la branche existe déjà : "
             echo "git checkout INT/${COULOIR} # se positionner sur la branche"
             echo "git merge ${EXPECTED_TAG}"
-            prompt "puis"
+            print "puis"
             echo "git push -u origin INT/${COULOIR} # envoie la branche sur le gitlab"
         else 
-            prompt_ko "[KO] Le tag indiqué en DLOT est absent : le processus demande la création d'un ticket d'anomalie"
+            print_ko "[KO] Le tag indiqué en DLOT est absent : le processus demande la création d'un ticket d'anomalie"
         fi
     else 
-        prompt_ko "[KO] Le tag indiqué en DLOT est absent : le processus demande la création d'un ticket d'anomalie"
-        prompt "Si le tag est absent, la consigne est de contacter le RDD pour connaitre la branche de laquelle forker"
-        prompt "Liste des branches distantes : "
+        print_ko "[KO] Le tag indiqué en DLOT est absent : le processus demande la création d'un ticket d'anomalie"
+        print "Si le tag est absent, la consigne est de contacter le RDD pour connaitre la branche de laquelle forker"
+        print "Liste des branches distantes : "
         git branch -r
-        prompt "Saisissez le nom de cette branche : " ; read IF_NO_TAG_BRANCH
+        print "Saisissez le nom de cette branche : " ; read IF_NO_TAG_BRANCH
         PRESENCE_DE_IF_NO_TAG_BRANCH=$(git branch -r | grep ${IF_NO_TAG_BRANCH} | wc -l)
         if [[ $PRESENCE_DE_IF_NO_TAG_BRANCH -gt 0 ]]; then 
-            prompt "[OK] La branche ${IF_NO_TAG_BRANCH} existe."
-            prompt "Pour créer la branche à partir de ${IF_NO_TAG_BRANCH} :"
+            print "[OK] La branche ${IF_NO_TAG_BRANCH} existe."
+            print "Pour créer la branche à partir de ${IF_NO_TAG_BRANCH} :"
             echo "git checkout ${IF_NO_TAG_BRANCH} # positionne le pointeur à l'emplacement du dernier commit de la branche "
             echo "git pull"
             echo "git status"
             echo
-            prompt "Si c'est la première livraison :"
+            print "Si c'est la première livraison :"
             echo "git checkout -b INT/${COULOIR} # crée la branche "
-            prompt "Si la branche existe déjà : "
+            print "Si la branche existe déjà : "
             echo "git checkout INT/${COULOIR} # se positionner sur la branche"
             echo "git merge ${IF_NO_TAG_BRANCH}"
             echo
-            prompt "puis"
+            print "puis"
             echo "git push -u origin INT/${COULOIR} # envoie la branche sur le gitlab"
         else
-            prompt_ko "[KO] La branche attendue n'existe pas: le processus demande la création d'un ticket d'anomalie"
+            print_ko "[KO] La branche attendue n'existe pas: le processus demande la création d'un ticket d'anomalie"
         fi 
     fi 
 
@@ -269,24 +269,24 @@ autoconformite_livraison_pfs() {
 
     # Verifier la présence des fichiers template
 
-    prompt "Vérification de présence du deploy.sh"
+    print "Vérification de présence du deploy.sh"
     check_file "deploy.sh"
-    prompt "Vérification de présence du env.sh.tmpl"
+    print "Vérification de présence du env.sh.tmpl"
     check_file "env.sh.tmpl"
-    prompt "Vérification de présence du charts_infos.sh"
+    print "Vérification de présence du charts_infos.sh"
     check_file "charts_infos.sh"
-    prompt "Vérification de présence du scripts/get_keys.sh"
+    print "Vérification de présence du scripts/get_keys.sh"
     check_file "scripts/get_keys.sh"
-    prompt "Vérification de présence du scripts/set_truststore_cacerts.sh"
+    print "Vérification de présence du scripts/set_truststore_cacerts.sh"
     check_file "scripts/set_truststore_cacerts.sh"
-    prompt "Vérification de présence du values.yaml.tmpl"
+    print "Vérification de présence du values.yaml.tmpl"
     check_file "values.yaml.tmpl"
 }
 # ça l'écrit en redmine, pas sur que ça soit utile
 extract_namespace_pods_state_for_redmine() {
     
-    prompt "Renseignez le nom de l'application testée : " ; read APP_NAME
-    prompt "Renseignez le namespace : " ; 
+    print "Renseignez le nom de l'application testée : " ; read APP_NAME
+    print "Renseignez le namespace : " ; 
     exemple
     NAMESPACE=
     read NAMESPACE
@@ -328,14 +328,14 @@ find_word_in_files() {
     PWD_COPY="$PWD" # c'est bizarre mais ça marche
     PATTERN_TO_SEARCH=
     PATH_TO_GO=
-    prompt "Liste des dossiers contenant les logs précédemment créés :"
+    print "Liste des dossiers contenant les logs précédemment créés :"
     ls -lath | grep ${LOG_FOLDER_PREFIX}
-    prompt "Souhaitez vous chercher dans une arborescence en particulier ? 
+    print "Souhaitez vous chercher dans une arborescence en particulier ? 
     Si non la recherche se fera dans ${PWD}
     Si oui saisissez l'arborescence : ${RAZ_STYLE}"
     read -p " " PATH_TO_GO
 
-    prompt "Saisissez un mot, ou une liste de mot au format : mot1|mot2|mot3
+    print "Saisissez un mot, ou une liste de mot au format : mot1|mot2|mot3
     exemple : erreur|error|fatal debug|warn  
     Que cherchez vous ? ${RAZ_STYLE}"
     read -p " " PATTERN_TO_SEARCH
@@ -353,7 +353,7 @@ find_word_in_files() {
 # au début c'était assez utile, maintenant c'est prrincipalement encore là pour
 # fournir un affichage plus propre sans avoir besoin d'exclure les SSL et SECURITY qui polluent l'affichage
 extract_kafka_topics_from_namespace() {
-    prompt "Renseignez le namespace :"
+    print "Renseignez le namespace :"
     exemple
     NAMESPACE=
     read NAMESPACE
@@ -362,7 +362,7 @@ extract_kafka_topics_from_namespace() {
         # on veut un résultat sur plusieurs lignes, du coup on peut pas utiliser $()
         topics=$(kubectl -n ${NAMESPACE} exec ${pod} -- printenv 2>/dev/null | egrep -i "(TOPIC)" | egrep -vi "(SSL|SECURITY)") # c'est très moche mais on est pas là pour la perf
         if [[ $topics ]]; then
-            prompt ${pod}
+            print ${pod}
             echo -e "${ORANGE_STYLE}"
             kubectl -n ${NAMESPACE} exec ${pod} -- printenv 2>/dev/null | egrep -i "(TOPIC)" | egrep -vi "(SSL|SECURITY)" # oui oui c'est une réplication
             echo -e ${RAZ_STYLE}        
@@ -373,18 +373,18 @@ extract_kafka_topics_from_namespace() {
 # car il pourrait y avoir trop de résultats pour tenir en console si on fouillait 
 # de l'ordre de plusieurs centaines de pods à la fois 
 extract_configuration_from_namespace() {
-    prompt "Renseignez le namespace :"
+    print "Renseignez le namespace :"
     exemple
     NAMESPACE=
     read NAMESPACE
-    prompt "Renseignez le(s avec des un|deux) token(s) que vous souhaitez voir : "
+    print "Renseignez le(s avec des un|deux) token(s) que vous souhaitez voir : "
     read TOKENS
     ALL_PODS=( $(kubectl get pods -n ${NAMESPACE} --no-headers -o custom-columns=":metadata.name") )
     for pod in ${ALL_PODS[@]}; do
         # on veut un résultat sur plusieurs lignes, du coup on peut pas utiliser $()
         topics=$(kubectl -n ${NAMESPACE} exec ${pod} -- printenv 2>/dev/null | egrep -i "(${TOKENS})" | egrep -vi "(SSL|SECURITY)") # c'est très moche mais on est pas là pour la perf
         if [[ $topics ]]; then
-            prompt ${pod}
+            print ${pod}
             echo -e "${ORANGE_STYLE}"
             kubectl -n ${NAMESPACE} exec ${pod} -- printenv 2>/dev/null | egrep -i "(${TOKENS})" | egrep -vi "(SSL|SECURITY)" # oui oui c'est une réplication
             echo -e ${RAZ_STYLE}        
@@ -449,19 +449,19 @@ get_several_namespaces_logs() {
     is_it_hope_or_madness= # j'étais vraiment content quand j'ai trouvé ça, d'où le nommage
     time_scale=
     # récupération des logs temporaires
-    prompt "Saisissez la liste des namespaces à interroger, séparés par des espaces : "
+    print "Saisissez la liste des namespaces à interroger, séparés par des espaces : "
     exemple
     read -r ALL_NAMESPACES
-    prompt "Indiquer la durée sur laquelle vous souhaitez consulter les logs de ${ORANGE_STYLE} ${ALL_NAMESPACES[@]} ${PROMPT_STYLE} 
+    print "Indiquer la durée sur laquelle vous souhaitez consulter les logs de ${ORANGE_STYLE} ${ALL_NAMESPACES[@]} ${PROMPT_STYLE} 
     -- > 15m , 30m , 1h , 6h, 2h30m :"
     read is_it_hope_or_madness 
-    prompt "Si vous le souhaitez, ajoutez un suffixe au nom de dossier ${LOG_FOLDER}, ou laisser vide :" 
+    print "Si vous le souhaitez, ajoutez un suffixe au nom de dossier ${LOG_FOLDER}, ou laisser vide :" 
     read LOG_FOLDER_SUFFIX
-    prompt "Récupération des logs de ${ALL_NAMESPACES[@]} "
+    print "Récupération des logs de ${ALL_NAMESPACES[@]} "
     if [[ ${LOG_FOLDER_SUFFIX} ]]; then 
         LOG_FOLDER=${LOG_FOLDER}_${LOG_FOLDER_SUFFIX}
     fi
-    prompt "création de ${LOG_FOLDER}"
+    print "création de ${LOG_FOLDER}"
     mkdir -p ${LOG_FOLDER}
     echo -e "${BLUE_STYLE} ----------------------------- ${RAZ_STYLE}"
     if [[ $is_it_hope_or_madness ]]; then 
@@ -483,7 +483,7 @@ get_several_namespaces_logs() {
         done
     done
     echo -e "${BLUE_STYLE} ----------------------------- ${RAZ_STYLE}"
-    prompt "Vous pouvez utiliser la recherche dans l'arborescence ${LOG_FOLDER} pour analyser ces logs"
+    print "Vous pouvez utiliser la recherche dans l'arborescence ${LOG_FOLDER} pour analyser ces logs"
 
 }
 
@@ -510,22 +510,22 @@ doc "Pour lister les paths utilisés par le script, ctrl+c puis tapez [ grep \"=
 display_warning_if_root
 while :; do
     print_separator
-    prompt_menu_item "n°" "Fonction"
+    print_menu_item "n°" "Fonction"
     print_separator
-    prompt_menu_item 1 "Obtenir les logs et compteurs, multi-namespace"
-    prompt_menu_item 2 "Connexion postgres sur un pod"
-    prompt_menu_item 3 "Aide à la réception de livraison"
-    prompt_menu_item 4 "Recherche de patterns texte dans une arborescence, récursif"
-    prompt_menu_item 5 "Extraction des topics kafka"
-    prompt_menu_item 6 "CR redmine de statut d'un namespace"
-    prompt_menu_item 7 "Rechercher la valeur d'un token dans les pods d'un namespace"
-    prompt_menu_item "café "   "Le coffee-timer dont vous avez toujours rêvé"
-    prompt_menu_item "exit "   "Quitter le script"
-    prompt_menu_item "del "  "Supprimer ce script (pour laisser le serveur propre)"
+    print_menu_item 1 "Obtenir les logs et compteurs, multi-namespace"
+    print_menu_item 2 "Connexion postgres sur un pod"
+    print_menu_item 3 "Aide à la réception de livraison"
+    print_menu_item 4 "Recherche de patterns texte dans une arborescence, récursif"
+    print_menu_item 5 "Extraction des topics kafka"
+    print_menu_item 6 "CR redmine de statut d'un namespace"
+    print_menu_item 7 "Rechercher la valeur d'un token dans les pods d'un namespace"
+    print_menu_item "café "   "Le coffee-timer dont vous avez toujours rêvé"
+    print_menu_item "exit "   "Quitter le script"
+    print_menu_item "del "  "Supprimer ce script (pour laisser le serveur propre)"
     print_separator
-    prompt "Pour voir l'implémentation d'une option, tapez 'NORUN' devant le numéro de commande"
-    prompt "Exemple : NORUN3"
-    prompt "Entrez un numéro de commande : "
+    print "Pour voir l'implémentation d'une option, tapez 'NORUN' devant le numéro de commande"
+    print "Exemple : NORUN3"
+    print "Entrez un numéro de commande : "
 
     # par précaution, on reset command
     command=
@@ -556,7 +556,7 @@ while :; do
     exit) exit_ok ;;
     *) print_title "Merci de saisir une commande dans la plage des valeurs prévues" ;;
     esac
-    prompt_again
+    print_again
 done
 
 # il n'y a plus rien a lire, si vous avez aimé l'histoire pensez à me sponsoriser sur tipee

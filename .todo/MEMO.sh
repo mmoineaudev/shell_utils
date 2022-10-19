@@ -53,7 +53,7 @@ write() {
     echo $1 >> ${FILE}
 }
 # Affichage en mode regex, pas de sauts de ligne à la fin
-prompt() {
+print() {
     echo -ne "${PROMPT_STYLE}"
     echo -ne "$1"
     echo -e "${RAZ_STYLE}"
@@ -86,25 +86,25 @@ ${ORANGE_STYLE} ${display_temps_passe} ${RAZ_STYLE} ${RED_STYLE} ${display_activ
 # récupère un input utilisateur, écrit dans le ${FILE} à la fin
 read_ticket() {
     TEMPS_PASSE=
-    prompt "Saisissez un numéro de ticket redmine ( Autres sinon ):"
+    print "Saisissez un numéro de ticket redmine ( Autres sinon ):"
     read TICKET
-    prompt "Saisissez une application (ou laissez vide):"
+    print "Saisissez une application (ou laissez vide):"
     read APPLI
     # Rajoutez ici les noms d'applis que vous utilisez [ echo -e "${ORANGE_STYLE}--> NOM_APPLI_1 ${RAZ_STYLE}"]
-    prompt "Liste des activités :\n"
+    print "Liste des activités :\n"
     # On affiche la liste d'activités
     for i in $(seq 0 ${#ACTIVITIES[@]}); do
         if [[ ${ACTIVITIES[$i]} ]]; then
             echo -e "  ${BLUE_STYLE} n° $i : ${ACTIVITIES[$i]} ${RAZ_STYLE}"
         fi
     done
-    prompt "Saisissez un numéro d'activité :"
+    print "Saisissez un numéro d'activité :"
     read ACTIVITY_INDEX
-    prompt "Saisissez si vous le souhaitez un commentaire ( \\\\n pour faire un saut de ligne):"
+    print "Saisissez si vous le souhaitez un commentaire ( \\\\n pour faire un saut de ligne):"
     read comment
-    prompt "Saisissez un temps passé (en proportion de journée, format [0:1].[0:9]) :"
+    print "Saisissez un temps passé (en proportion de journée, format [0:1].[0:9]) :"
     read TEMPS_PASSE
-    prompt "KANBAN : TODO DOING DONE"
+    print "KANBAN : TODO DOING DONE"
     read KANBAN
     write " ${TICKET} ${separator_char} ${TEMPS_PASSE} ${KANBAN} ${separator_char} ${ACTIVITIES[${ACTIVITY_INDEX}]} ${APPLI}${separator_char} [$(date +%H:%M)] ${comment}"
 }
@@ -113,15 +113,15 @@ read_ticket() {
 print_title
 # récupère les noms des fichiers précédement créés
 ls *${NAMING}*
-prompt "Entrez un nom de fichier pour consulter les actions des jours précédents, rien sinon :"
+print "Entrez un nom de fichier pour consulter les actions des jours précédents, rien sinon :"
 read -r PREVIOUS_FILES
 # si c'est vide on ne rentre pas dans le for
 for selected_file in ${PREVIOUS_FILES[@]}; do
-    prompt "${selected_file}\ntri par ticket :"
+    print "${selected_file}\ntri par ticket :"
     sort ${selected_file} > temp.${selected_file}
     read_from_file temp.${selected_file}
     OK=
-    prompt "Appuyez sur entrée..."
+    print "Appuyez sur entrée..."
     rm -f temp.${selected_file}
     read OK
 done
@@ -129,7 +129,7 @@ done
 while :; do
     clear
     print_title
-    prompt "Affichage de ${FILE}\n"
+    print "Affichage de ${FILE}\n"
     read_from_file ${FILE}
     read_ticket
 done
