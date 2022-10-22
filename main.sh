@@ -47,7 +47,7 @@ print_avalaible_functions() {
 
 print_avalaible_functions
 
-# coucou
+# bonjour, ceci est une modif complétement legit 
 
 print "Entrez une fonction et éventuellement ses arguments :"
 read -p "> " FUNCTION
