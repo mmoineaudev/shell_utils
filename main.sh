@@ -47,6 +47,8 @@ print_avalaible_functions() {
 
 print_avalaible_functions
 
+# coucou
+
 print "Entrez une fonction et éventuellement ses arguments :"
 read -p "> " FUNCTION
 
